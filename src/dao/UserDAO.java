@@ -34,7 +34,7 @@ public class userDAO
         }
     }
 
-    public static void Registration(String username, String password)
+    public static boolean Registration(String username, String password)
     {
         try(conn=DriverManager.getConnection(URL))
         {
@@ -47,11 +47,11 @@ public class userDAO
                 int rowsAffected=stmt.executeUpdate();
                 if(rowsAffected>0)
                 {
-                    System.out.println("Registration successful!");
+                    return true;
                 }
                 else
                 {
-                    System.out.println("Registration failed. Please try again.");
+                    return false;
                 }
             }
         }

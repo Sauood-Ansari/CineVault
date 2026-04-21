@@ -5,7 +5,7 @@ The **utils** package contains helper classes that provide common functionalitie
 ## 📁 Classes
 
 * **Validator.java**
-  Handles input validation such as checking empty fields, email format, and basic constraints.
+  Handles input validation such as checking empty fields, and basic constraints.
 
 * **SessionManager.java**
   Manages the current logged-in user session throughout the application.
