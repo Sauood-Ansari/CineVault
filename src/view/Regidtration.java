@@ -1,24 +1,24 @@
 package view;
 
 import javax.swing.*;
-public class LoginPage
+
+public class Regidtration 
 {
     private JFrame frame;
     private JTextField usernameField;
     private JPasswordField passwordField;
-    private JButton loginButton,registerButton;
+    private JButton registerButton;
 
-    public  LoginPage()
+    public Regidtration()
     {
-        frame = new JFrame("Login");
+        frame = new JFrame("Registration");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         //frame.setSize(400, 400);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         //frame.setLocationRelativeTo(null);
 
-        usernameField = new JTextField(40);
-        passwordField = new JPasswordField(40);
-        loginButton = new JButton("Login");
+        usernameField = new JTextField(20);
+        passwordField = new JPasswordField(20);
         registerButton = new JButton("Register");
 
         JPanel panel = new JPanel();
@@ -26,7 +26,6 @@ public class LoginPage
         panel.add(usernameField);
         panel.add(new JLabel("Password:"));
         panel.add(passwordField);
-        panel.add(loginButton);
         panel.add(registerButton);
 
         frame.add(panel);
@@ -35,5 +34,11 @@ public class LoginPage
     public void setVisible(boolean visible)
     {
         frame.setVisible(visible);
+    }
+
+    public static void main(String[] args)
+    {
+        Regidtration registration = new Regidtration();
+        registration.setVisible(true);
     }
 }
