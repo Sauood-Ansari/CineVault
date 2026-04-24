@@ -7,12 +7,17 @@ public class HomePage extends JPanel {
 
     private CardLayout cardLayout;
     private JPanel contentPanel;
-    MainFrame frame;
+    private MainFrame frame;
 
-    public HomePage(MainFrame frame) 
-    {
-    	this.frame=frame;
-    	
+    // 🔥 Store references
+    private Dashboard dashboardPanel;
+    private AddMoviePage addMoviePage;
+    private MovieCollectionPage movieListPage;
+
+    public HomePage(MainFrame frame) {
+
+        this.frame = frame;
+
         setLayout(new BorderLayout());
 
         // TOP BAR
@@ -23,7 +28,7 @@ public class HomePage extends JPanel {
         // SIDEBAR
         JPanel sideBar = new JPanel();
         sideBar.setLayout(new BoxLayout(sideBar, BoxLayout.Y_AXIS));
-        sideBar.setPreferredSize(new Dimension(100, 0));
+        sideBar.setPreferredSize(new Dimension(120, 0));
 
         JButton dashboardBtn = new JButton("Dashboard");
         JButton addMovieBtn = new JButton("Add Movie");
@@ -48,18 +53,35 @@ public class HomePage extends JPanel {
         cardLayout = new CardLayout();
         contentPanel = new JPanel(cardLayout);
 
-        contentPanel.add(new Dashboard(), "dashboard");
-        contentPanel.add(new AddMoviePage(), "add");
-        contentPanel.add(new MovieCollectionPage(), "list");
-        contentPanel.add(new LoginPage(frame),"login");
+        // 🔥 Initialize once
+        dashboardPanel = new Dashboard();
+        addMoviePage = new AddMoviePage();
+        movieListPage = new MovieCollectionPage();
 
-        //BUTTON ACTIONS
-        dashboardBtn.addActionListener(e -> cardLayout.show(contentPanel, "dashboard"));
-        addMovieBtn.addActionListener(e -> cardLayout.show(contentPanel, "add"));
-        movieListBtn.addActionListener(e -> cardLayout.show(contentPanel, "list"));
-        logOutBtn.addActionListener(e -> System.exit(ABORT));
+        contentPanel.add(dashboardPanel, "dashboard");
+        contentPanel.add(addMoviePage, "add");
+        contentPanel.add(movieListPage, "list");
 
-        // ADD TO MAIN PANEL
+        // BUTTON ACTIONS
+
+        dashboardBtn.addActionListener(e -> {
+            dashboardPanel.refreshDashboard(); // 🔥 refresh data
+            cardLayout.show(contentPanel, "dashboard");
+        });
+
+        addMovieBtn.addActionListener(e -> {
+            cardLayout.show(contentPanel, "add");
+        });
+
+        movieListBtn.addActionListener(e -> {
+            movieListPage.refreshTable(); // 🔥 refresh table
+            cardLayout.show(contentPanel, "list");
+        });
+
+        logOutBtn.addActionListener(e -> {
+            frame.showPage("login"); // 🔥 proper logout
+        });
+
         add(topBar, BorderLayout.NORTH);
         add(sideBar, BorderLayout.WEST);
         add(contentPanel, BorderLayout.CENTER);

@@ -92,4 +92,14 @@ public class MovieController
     {
         return movieDAO.getTotalMoviesByGenre(genre);
     }
+    
+    //Editing Movies
+    public boolean updateMovie(int id, String title, String genre, String year, double rating) {
+        try {
+            return movieDAO.updateMovie(id, title, genre, year, rating);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

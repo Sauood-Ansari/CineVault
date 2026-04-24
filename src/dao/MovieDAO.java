@@ -124,4 +124,23 @@ public class MovieDAO
         }
         return 0;
     }
+    
+    //Editing Movies
+    public boolean updateMovie(int id, String title, String genre, String year, double rating) throws SQLException {
+
+    	try (Connection conn = DBConnection.getConnection())
+        {
+        String sql = "UPDATE movies SET title=?, genre=?, year=?, rating=? WHERE id=?";
+
+        PreparedStatement ps = conn.prepareStatement(sql);
+
+        ps.setString(1, title);
+        ps.setString(2, genre);
+        ps.setString(3, year);   // 🔥 stays TEXT
+        ps.setDouble(4, rating);
+        ps.setInt(5, id);
+
+        return ps.executeUpdate() > 0;
+        }
+    }
 }
