@@ -1,28 +1,21 @@
 package view;
 
 import java.awt.Dimension;
-import java.awt.GridBagLayout;
 import javax.swing.*;
 import controller.MovieController;
 
 public class AddMoviePage{
-	private JFrame movieCollectionFrame;
+
 	private JPanel mainPanel;
 	private JTextField title, genre, year, rating;
 	private JButton addMovieButton;
 	
-	String movieTitle,movieGenre;
-	int movieYear;
-	double movieRating;
+	String movieTitle,movieGenre,movieYear,movieRating;
 
 	MovieController movieController = new MovieController();
 
 	public void addMovie() {
-		movieCollectionFrame =new JFrame("Movies Collection");
-		movieCollectionFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		movieCollectionFrame.setSize(400, 400);
-		movieCollectionFrame.setLayout(new GridBagLayout());
-		//movieCollectionFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+
 		
 		title=new JTextField();
 		genre=new JTextField();		
@@ -51,20 +44,21 @@ public class AddMoviePage{
 		mainPanel.add(addMovieButton);		
 
 		
-		movieCollectionFrame.add(mainPanel);
 
 		addMovieButton.addActionListener(e -> {
 			movieTitle = title.getText();
 			movieGenre = genre.getText();
-			movieYear = Integer.parseInt(year.getText());
-			movieRating = Double.parseDouble(rating.getText());
+			movieYear = year.getText();
+			movieRating = rating.getText();
 
 			// movieController.addMovie(movieTitle, movieGenre, movieYear, movieRating);
 			
 		});
-		movieCollectionFrame.setLayout(new GridBagLayout());
-		movieCollectionFrame.setVisible(true);
-
 	}
+	
+	public void setVisible(boolean visible)
+    {
+        mainPanel.setVisible(visible);
+    }
 	
 }
