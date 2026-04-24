@@ -10,7 +10,8 @@ public class AddMoviePage extends JPanel {
     private JButton addMovieButton;
     private MovieController movieController = new MovieController();
 
-    public AddMoviePage() 
+    @SuppressWarnings("unused")
+	public AddMoviePage() 
     {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));

@@ -6,7 +6,8 @@ import controller.*;
 
 public class LoginPage extends JPanel {
 
-	private MainFrame frame;
+	@SuppressWarnings("unused")
+    private MainFrame frame;
 
 	public LoginPage(MainFrame frame) {
     	

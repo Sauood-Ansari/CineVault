@@ -5,6 +5,7 @@ import java.awt.*;
 
 public class Registration extends JPanel {
 
+    @SuppressWarnings("unused")
     private MainFrame frame;
 
     public Registration(MainFrame frame) {
