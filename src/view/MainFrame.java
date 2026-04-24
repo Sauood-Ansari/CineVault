@@ -11,7 +11,8 @@ public class MainFrame extends JFrame {
 
     public MainFrame() {
         setTitle("CineVault");
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        //setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setSize(400,400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // CardLayout setup
@@ -21,12 +22,12 @@ public class MainFrame extends JFrame {
         // Create pages
         LoginPage loginPage = new LoginPage(this);
         Registration registration = new Registration(this);
-        Dashboard dashboard=new Dashboard(this);
+        HomePage homePage=new HomePage(this);
 
         // Add pages with names
         mainPanel.add(loginPage, "login");
         mainPanel.add(registration, "Registration");
-        mainPanel.add(dashboard, "Dashboard");
+        mainPanel.add(homePage, "Home Page");
 
 
         add(mainPanel);

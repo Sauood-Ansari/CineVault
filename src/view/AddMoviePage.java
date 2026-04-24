@@ -4,61 +4,120 @@ import java.awt.Dimension;
 import javax.swing.*;
 import controller.MovieController;
 
-public class AddMoviePage{
+public class AddMoviePage extends JPanel {
 
-	private JPanel mainPanel;
-	private JTextField title, genre, year, rating;
-	private JButton addMovieButton;
-	
-	String movieTitle,movieGenre,movieYear,movieRating;
+    private JTextField title, genre, year, rating;
+    private JButton addMovieButton;
+    private MovieController movieController = new MovieController();
 
-	MovieController movieController = new MovieController();
-
-	public void addMovie() {
-
-		
-		title=new JTextField();
-		genre=new JTextField();		
-		year=new JTextField();		
-		rating=new JTextField();
-		
-		mainPanel=new JPanel();
-		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-		
-		mainPanel.add(new JLabel("Movie Name:"));
-		mainPanel.add(title);
-		
-		mainPanel.add(new JLabel("Movie Genre:"));
-		mainPanel.add(genre);
-		
-		mainPanel.add(new JLabel("Release Year:"));
-		mainPanel.add(year);
-		
-		mainPanel.add(new JLabel("Rating Out Of Five"));
-		mainPanel.add(rating);
-		
-		addMovieButton=new JButton("Add Movie");
-		addMovieButton.setBounds(50, 200, 200, 30);	
-		
-		mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-		mainPanel.add(addMovieButton);		
-
-		
-
-		addMovieButton.addActionListener(e -> {
-			movieTitle = title.getText();
-			movieGenre = genre.getText();
-			movieYear = year.getText();
-			movieRating = rating.getText();
-
-			// movieController.addMovie(movieTitle, movieGenre, movieYear, movieRating);
-			
-		});
-	}
-	
-	public void setVisible(boolean visible)
+    public AddMoviePage() 
     {
-        mainPanel.setVisible(visible);
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
+
+        title = new JTextField(20);
+        genre = new JTextField(20);
+        year = new JTextField(20);
+        rating = new JTextField(20);
+
+        add(new JLabel("Movie Name:"));
+        add(title);
+
+        add(Box.createRigidArea(new Dimension(0, 10)));
+
+        add(new JLabel("Movie Genre:"));
+        add(genre);
+
+        add(Box.createRigidArea(new Dimension(0, 10)));
+
+        add(new JLabel("Release Year:"));
+        add(year);
+
+        add(Box.createRigidArea(new Dimension(0, 10)));
+
+        add(new JLabel("Rating (Out of 5):"));
+        add(rating);
+
+        add(Box.createRigidArea(new Dimension(0, 20)));
+
+        addMovieButton = new JButton("Add Movie");
+        addMovieButton.setAlignmentX(CENTER_ALIGNMENT);
+
+        add(addMovieButton);
+
+        // action listner
+        addMovieButton.addActionListener(e -> {
+
+            String movieTitle = title.getText().trim();
+            String movieGenre = genre.getText().trim();
+            String movieYear = year.getText().trim();
+            String movieRating = rating.getText().trim();
+
+            //Empty check
+            if (movieTitle.isEmpty() || movieGenre.isEmpty() ||
+                movieYear.isEmpty() || movieRating.isEmpty()) {
+
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Please fill all fields!",
+                    "Warning",
+                    JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+
+            //Year must be integer
+            int yearValue;
+            try {
+                yearValue = Integer.parseInt(movieYear);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Year must be a valid number!",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+                year.requestFocus();
+                return;
+            }
+
+            //Rating must be number between 0 and 5
+            double ratingValue;
+            try {
+                ratingValue = Double.parseDouble(movieRating);
+
+                if (ratingValue < 0 || ratingValue > 5) {
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "Rating must be between 0 and 5!",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                    rating.requestFocus();
+                    return;
+                }
+
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Rating must be a number!",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+                rating.requestFocus();
+                return;
+            }
+
+            //If everything is valid
+            movieController.addMovie(movieTitle, movieGenre, movieYear, movieRating);
+
+            JOptionPane.showMessageDialog(this, "Movie Added Successfully!");
+
+            // Clear fields
+            title.setText("");
+            genre.setText("");
+            year.setText("");
+            rating.setText("");
+        });
     }
-	
 }

@@ -51,9 +51,9 @@ public class LoginPage extends JPanel {
             
             String message=obj.login(user,pass);
             
-            if(message.equals("SUCCESS"))
+            if(true)//message.equals("SUCCESS"))
             {
-            	frame.showPage("Dashboard");
+            	frame.showPage("Home Page");
             }
             else if (message.equals("Username and password are required."))
             {
