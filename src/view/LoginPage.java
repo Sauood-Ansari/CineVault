@@ -1,39 +1,68 @@
 package view;
 
 import javax.swing.*;
-public class LoginPage
-{
-    private JFrame frame;
-    private JTextField usernameField;
-    private JPasswordField passwordField;
-    private JButton loginButton,registerButton;
+import java.awt.*;
+import controller.*;
 
-    public  LoginPage()
-    {
-        frame = new JFrame("Login");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //frame.setSize(400, 400);
-        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        //frame.setLocationRelativeTo(null);
+public class LoginPage extends JPanel {
 
-        usernameField = new JTextField(40);
-        passwordField = new JPasswordField(40);
-        loginButton = new JButton("Login");
-        registerButton = new JButton("Register");
+	private MainFrame frame;
 
-        JPanel panel = new JPanel();
-        panel.add(new JLabel("Username:"));
-        panel.add(usernameField);
-        panel.add(new JLabel("Password:"));
-        panel.add(passwordField);
-        panel.add(loginButton);
-        panel.add(registerButton);
+	public LoginPage(MainFrame frame) {
+    	
+    	this.frame=frame;
+    	
+        setLayout(new FlowLayout(FlowLayout.CENTER, 10, 20));
 
-        frame.add(panel);
-    }
+        // Username row
+        JPanel userPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        userPanel.add(new JLabel("Username:"));
+        JTextField username = new JTextField(15);
+        userPanel.add(username);
 
-    public void setVisible(boolean visible)
-    {
-        frame.setVisible(visible);
+        // Password row
+        JPanel passPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        passPanel.add(new JLabel("Password:"));
+        JPasswordField password = new JPasswordField(15);
+        passPanel.add(password);
+
+        // Button row
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JButton loginButton=new JButton("Login");
+        buttonPanel.add(loginButton);
+        JButton registerButton =new JButton("Register");
+        buttonPanel.add(registerButton);
+
+        // Add all rows
+        add(userPanel);
+        add(passPanel);
+        add(buttonPanel);
+        
+        //action listener to redirect to registration
+        registerButton.addActionListener(e -> {
+            frame.showPage("Registration");
+        });
+        
+      //action listener to redirect to dashboard
+        loginButton.addActionListener(e -> {
+        	String user=username.getText();
+        	String pass=new String(password.getPassword());
+        	AuthController obj=new AuthController();
+            
+            String message=obj.login(user,pass);
+            
+            if(message.equals("SUCCESS"))
+            {
+            	frame.showPage("Dashboard");
+            }
+            else if (message.equals("Username and password are required."))
+            {
+            	JOptionPane.showMessageDialog(this, message);
+            }
+            else
+            {
+            	JOptionPane.showMessageDialog(this, "Invalid username or password.");
+            }
+        });
     }
 }
