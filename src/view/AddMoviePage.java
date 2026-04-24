@@ -59,7 +59,7 @@ public class AddMoviePage{
 			movieYear = Integer.parseInt(year.getText());
 			movieRating = Double.parseDouble(rating.getText());
 
-			movieController.addMovie(movieTitle, movieGenre, movieYear, movieRating);
+			// movieController.addMovie(movieTitle, movieGenre, movieYear, movieRating);
 			
 		});
 		movieCollectionFrame.setLayout(new GridBagLayout());
