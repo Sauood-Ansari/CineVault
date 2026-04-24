@@ -1,7 +1,9 @@
 package view;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.util.List;
 
@@ -15,23 +17,66 @@ public class MovieCollectionPage extends JPanel {
     private MovieController movieController;
 
     public MovieCollectionPage() {
-
-        setLayout(new BorderLayout());
+        setLayout(new BorderLayout(20, 20));
+        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         movieController = new MovieController();
 
-        // ID included (important)
         String[] columns = {"ID", "Title", "Genre", "Year", "Rating"};
-        tableModel = new DefaultTableModel(columns, 0);
+        tableModel = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; 
+            }
+        };
 
         table = new JTable(tableModel);
+        table.setRowHeight(35);
+        table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        table.setSelectionBackground(new Color(52, 152, 219));
+        table.setSelectionForeground(Color.WHITE);
+        table.setShowVerticalLines(false);
+        table.setGridColor(new Color(230, 230, 230));
+
+        JTableHeader header = table.getTableHeader();
+        header.setPreferredSize(new Dimension(0, 45));
+        
+        DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer();
+        headerRenderer.setBackground(new Color(41, 128, 185));
+        headerRenderer.setForeground(Color.WHITE);
+        headerRenderer.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        headerRenderer.setHorizontalAlignment(SwingConstants.LEFT);
+        headerRenderer.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(0, 0, 1, 1, new Color(200, 200, 200)),
+            BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        ));
+
+        for (int i = 0; i < table.getColumnModel().getColumnCount(); i++) {
+            table.getColumnModel().getColumn(i).setHeaderRenderer(headerRenderer);
+        }
+
+        DefaultTableCellRenderer cellRenderer = new DefaultTableCellRenderer();
+        cellRenderer.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
+        for (int i = 0; i < table.getColumnModel().getColumnCount(); i++) {
+            table.getColumnModel().getColumn(i).setCellRenderer(cellRenderer);
+        }
 
         JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(220, 220, 220)));
+        scrollPane.getViewport().setBackground(Color.WHITE);
         add(scrollPane, BorderLayout.CENTER);
 
         JButton editButton = new JButton("Edit Selected");
+        editButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        editButton.setPreferredSize(new Dimension(150, 40));
+        editButton.setBackground(new Color(41, 128, 185));
+        editButton.setForeground(Color.WHITE);
+        editButton.setFocusPainted(false);
+        editButton.setBorderPainted(false);
+        editButton.setOpaque(true);
 
-        JPanel bottomPanel = new JPanel();
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        bottomPanel.setBackground(new Color(245, 245, 245));
         bottomPanel.add(editButton);
 
         add(bottomPanel, BorderLayout.SOUTH);
@@ -46,9 +91,7 @@ public class MovieCollectionPage extends JPanel {
     }
 
     private void loadMovies() {
-
         List<Movie> movies = movieController.fetchAllMovies();
-
         tableModel.setRowCount(0);
 
         for (Movie movie : movies) {
@@ -56,18 +99,17 @@ public class MovieCollectionPage extends JPanel {
                     movie.getId(),
                     movie.getTitle(),
                     movie.getGenre(),
-                    String.valueOf(movie.getYear()), // DB stores TEXT
+                    String.valueOf(movie.getYear()), 
                     movie.getRating()
             });
         }
     }
 
     private void handleEdit() {
-
         int selectedRow = table.getSelectedRow();
 
         if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, "Please select a movie first!");
+            JOptionPane.showMessageDialog(this, "Please select a movie first!", "Warning", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -82,7 +124,9 @@ public class MovieCollectionPage extends JPanel {
         JTextField yearField = new JTextField(year);
         JTextField ratingField = new JTextField(rating);
 
-        JPanel panel = new JPanel(new GridLayout(4, 2));
+        JPanel panel = new JPanel(new GridLayout(4, 2, 10, 15));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
         panel.add(new JLabel("Title:"));
         panel.add(titleField);
         panel.add(new JLabel("Genre:"));
@@ -96,21 +140,20 @@ public class MovieCollectionPage extends JPanel {
                 this,
                 panel,
                 "Edit Movie",
-                JOptionPane.OK_CANCEL_OPTION
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE
         );
 
         if (result == JOptionPane.OK_OPTION) {
-
             String newTitle = titleField.getText().trim();
             String newGenre = genreField.getText().trim();
-            String newYear = yearField.getText().trim(); // stays STRING
+            String newYear = yearField.getText().trim(); 
             String newRating = ratingField.getText().trim();
 
-            // Validation
             if (newTitle.isEmpty() || newGenre.isEmpty() ||
                 newYear.isEmpty() || newRating.isEmpty()) {
 
-                JOptionPane.showMessageDialog(this, "All fields are required!");
+                JOptionPane.showMessageDialog(this, "All fields are required!", "Warning", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
@@ -119,16 +162,15 @@ public class MovieCollectionPage extends JPanel {
             try {
                 ratingValue = Double.parseDouble(newRating);
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Rating must be a number!");
+                JOptionPane.showMessageDialog(this, "Rating must be a number!", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             if (ratingValue < 0 || ratingValue > 5) {
-                JOptionPane.showMessageDialog(this, "Rating must be between 0 and 5!");
+                JOptionPane.showMessageDialog(this, "Rating must be between 0 and 5!", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            // Update FULL movie 
             boolean updated = movieController.updateMovie(
                     movieId,
                     newTitle,
@@ -138,10 +180,10 @@ public class MovieCollectionPage extends JPanel {
             );
 
             if (updated) {
-                JOptionPane.showMessageDialog(this, "Movie updated successfully!");
+                JOptionPane.showMessageDialog(this, "Movie updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 refreshTable();
             } else {
-                JOptionPane.showMessageDialog(this, "Update failed!");
+                JOptionPane.showMessageDialog(this, "Update failed!", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
