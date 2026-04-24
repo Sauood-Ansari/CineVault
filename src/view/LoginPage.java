@@ -51,7 +51,7 @@ public class LoginPage extends JPanel {
             
             String message=obj.login(user,pass);
             
-            if(true)//message.equals("SUCCESS"))
+            if(message.equals("SUCCESS"))
             {
             	frame.showPage("Home Page");
             }
