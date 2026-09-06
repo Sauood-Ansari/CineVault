@@ -9,6 +9,7 @@ public class MainFrame extends JFrame {
 
     private CardLayout cardLayout;
     private JPanel mainPanel;
+    private HomePage homePage;
 
     public MainFrame() {
         applyGlobalStyles();
@@ -23,7 +24,7 @@ public class MainFrame extends JFrame {
 
         LoginPage loginPage = new LoginPage(this);
         Registration registration = new Registration(this);
-        HomePage homePage = new HomePage(this);
+        homePage = new HomePage(this);
 
         mainPanel.add(loginPage, "login");
         mainPanel.add(registration, "Registration");
@@ -34,6 +35,9 @@ public class MainFrame extends JFrame {
     }
 
     public void showPage(String pageName) {
+        if (pageName.equals("Home Page")) {
+            homePage.refresh();
+        }
         cardLayout.show(mainPanel, pageName);
     }
 

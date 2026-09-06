@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,13 +11,13 @@ import model.Movie;
 
 public class MovieDAO
 {   
-    // Inserts a new movie record into the database
-    public boolean addMovie(Movie movie) throws SQLException 
+    // Inserts a new movie record into the database, linked to a specific user
+    public boolean addMovie(Movie movie, int userId) throws SQLException 
     {
         // Try-with-resources ensures connection closes automatically
         try (Connection conn = DBConnection.getConnection())
         {
-            String query = "INSERT INTO movies(title, genre, year, rating) VALUES (?, ?, ?, ?)";
+            String query = "INSERT INTO movies(title, genre, year, rating, user_id) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement stmt = conn.prepareStatement(query);
 
             // Setting values from Movie object to SQL query
@@ -26,51 +25,55 @@ public class MovieDAO
             stmt.setString(2, movie.getGenre());
             stmt.setInt(3, movie.getYear());
             stmt.setDouble(4, movie.getRating());
+            stmt.setInt(5, userId);
 
             // executeUpdate returns number of rows affected
             return stmt.executeUpdate() > 0;
         }
     }
 
-    // Updates rating of a specific movie using its ID
-    public boolean updateMovieRating(int movieId, double newRating) throws SQLException
+    // Updates rating of a specific movie using its ID, scoped to user
+    public boolean updateMovieRating(int movieId, double newRating, int userId) throws SQLException
     {
         try (Connection conn = DBConnection.getConnection())
         {
-            String query = "UPDATE movies SET rating=? WHERE id=?";
+            String query = "UPDATE movies SET rating=? WHERE id=? AND user_id=?";
             PreparedStatement stmt = conn.prepareStatement(query);
 
             stmt.setDouble(1, newRating);
             stmt.setInt(2, movieId);
+            stmt.setInt(3, userId);
 
             return stmt.executeUpdate() > 0;
         }
     }
 
-    // Deletes a movie record based on ID
-    public boolean deleteMovie(int movieId) throws SQLException
+    // Deletes a movie record based on ID, scoped to user
+    public boolean deleteMovie(int movieId, int userId) throws SQLException
     {
         try (Connection conn = DBConnection.getConnection())
         {
-            String query = "DELETE FROM movies WHERE id=?";
+            String query = "DELETE FROM movies WHERE id=? AND user_id=?";
             PreparedStatement stmt = conn.prepareStatement(query);
 
             stmt.setInt(1, movieId);
+            stmt.setInt(2, userId);
 
             return stmt.executeUpdate() > 0;
         }
     }
     
-    // Fetches all movies from database and returns as a list
-    public List<Movie> fetchAllMovies() throws SQLException
+    // Fetches all movies for a specific user from database
+    public List<Movie> fetchAllMovies(int userId) throws SQLException
     {
         List<Movie> movies = new ArrayList<>();
 
         try (Connection conn = DBConnection.getConnection())
         {
-            String query = "SELECT * FROM movies";
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(query);
+            String query = "SELECT * FROM movies WHERE user_id=?";
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
 
             // Iterate over result set and convert each row into Movie object
             while (rs.next()) {
@@ -82,15 +85,16 @@ public class MovieDAO
         return movies;
     }
 
-    // Returns total number of movies in the database
-    public int getTotalMovies()
+    // Returns total number of movies for a specific user
+    public int getTotalMovies(int userId)
     {
-        String sql = "SELECT COUNT(*) FROM movies";
+        String sql = "SELECT COUNT(*) FROM movies WHERE user_id=?";
 
         try(Connection conn = DBConnection.getConnection(); 
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery())
+            PreparedStatement stmt = conn.prepareStatement(sql))
             {
+                stmt.setInt(1, userId);
+                ResultSet rs = stmt.executeQuery();
                 // If result exists, return count
                 if(rs.next()){
                     return rs.getInt(1);
@@ -102,15 +106,16 @@ public class MovieDAO
         return 0; // Default if error occurs
     }
     
-    // Returns total number of movies filtered by genre
-    public int getTotalMoviesByGenre(String genre)
+    // Returns total number of movies filtered by genre for a specific user
+    public int getTotalMoviesByGenre(String genre, int userId)
     {
-        String sql = "SELECT COUNT(*) FROM movies WHERE genre = ?";
+        String sql = "SELECT COUNT(*) FROM movies WHERE genre = ? AND user_id=?";
         try (Connection conn = DBConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql))
         {
-            // Set genre parameter
+            // Set parameters
             stmt.setString(1, genre);
+            stmt.setInt(2, userId);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
@@ -125,12 +130,12 @@ public class MovieDAO
         return 0;
     }
     
-    //Editing Movies
-    public boolean updateMovie(int id, String title, String genre, String year, double rating) throws SQLException {
+    //Editing Movies, scoped to user
+    public boolean updateMovie(int id, String title, String genre, String year, double rating, int userId) throws SQLException {
 
     	try (Connection conn = DBConnection.getConnection())
         {
-        String sql = "UPDATE movies SET title=?, genre=?, year=?, rating=? WHERE id=?";
+        String sql = "UPDATE movies SET title=?, genre=?, year=?, rating=? WHERE id=? AND user_id=?";
 
         PreparedStatement ps = conn.prepareStatement(sql);
 
@@ -139,8 +144,9 @@ public class MovieDAO
         ps.setString(3, year);
         ps.setDouble(4, rating);
         ps.setInt(5, id);
+        ps.setInt(6, userId);
 
         return ps.executeUpdate() > 0;
         }
     }
-}
+}

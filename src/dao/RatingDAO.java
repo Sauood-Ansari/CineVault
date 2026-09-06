@@ -12,8 +12,8 @@ import model.Movie;
 // DAO for fetching movies based on rating
 public class RatingDAO
 {
-    // Returns list of movies with rating >= given value
-    public List<Movie> getMoviesByRating(double rating) throws SQLException
+    // Returns list of movies with rating >= given value for a specific user
+    public List<Movie> getMoviesByRating(double rating, int userId) throws SQLException
     {
         List<Movie> movies = new ArrayList<>();
 
@@ -21,10 +21,11 @@ public class RatingDAO
         try (Connection conn = DBConnection.getConnection()) {
 
             // PreparedStatement prevents SQL injection
-            String query = "SELECT id, title, genre, year, rating FROM movies WHERE rating >= ?";
+            String query = "SELECT id, title, genre, year, rating FROM movies WHERE rating >= ? AND user_id = ?";
             PreparedStatement stmt = conn.prepareStatement(query);
 
             stmt.setDouble(1, rating); // set rating parameter
+            stmt.setInt(2, userId); // set user parameter
             ResultSet rs = stmt.executeQuery(); // execute query
 
             // Convert each row into Movie object
@@ -42,4 +43,4 @@ public class RatingDAO
 
         return movies;
     }
-}
+}

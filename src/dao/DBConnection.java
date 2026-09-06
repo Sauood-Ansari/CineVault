@@ -35,7 +35,8 @@ public class DBConnection
                 title TEXT NOT NULL,
                 genre TEXT,
                 year TEXT,
-                rating REAL
+                rating REAL,
+                user_id INTEGER REFERENCES users(id)
             );
         """;
 
@@ -49,8 +50,16 @@ public class DBConnection
 
         try (Statement stmt = conn.createStatement())
         {
-            stmt.execute(createMoviesTable);
             stmt.execute(createUsersTable);
+            stmt.execute(createMoviesTable);
+
+            // Safe migration: add user_id column to existing movies table
+            // SQLite will throw if column already exists, so we catch and ignore
+            try {
+                stmt.execute("ALTER TABLE movies ADD COLUMN user_id INTEGER REFERENCES users(id)");
+            } catch (SQLException e) {
+                // Column already exists, ignore
+            }
         } 
         catch (SQLException e)
         {

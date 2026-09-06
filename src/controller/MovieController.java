@@ -3,6 +3,7 @@ package controller;
 import java.sql.SQLException;
 
 import utils.Validator;
+import utils.SessionManager;
 import java.util.List;
 import dao.MovieDAO;
 import model.Movie;
@@ -12,6 +13,11 @@ public class MovieController
 {
     // DAO for DB operations
     private final MovieDAO movieDAO = new MovieDAO();
+
+    // Gets the current logged-in user's ID
+    private int getCurrentUserId() {
+        return SessionManager.getCurrentUser().getId();
+    }
 
     // Adds a new movie after validation
     public String addMovie(String title, String genre, String yearText, String ratingText)
@@ -41,8 +47,8 @@ public class MovieController
         Movie movie = new Movie(title.trim(), genre.trim(), year, rating);
 
         try {
-            // Save movie in database
-            return movieDAO.addMovie(movie) ? "SUCCESS" : "Movie could not be added.";
+            // Save movie in database, linked to current user
+            return movieDAO.addMovie(movie, getCurrentUserId()) ? "SUCCESS" : "Movie could not be added.";
         } catch (SQLException e) {
             return "Unable to add movie: " + e.getMessage();
         }
@@ -52,7 +58,7 @@ public class MovieController
     public boolean removeMovie(int movieId)
     {
         try {
-            return movieDAO.deleteMovie(movieId);
+            return movieDAO.deleteMovie(movieId, getCurrentUserId());
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -63,40 +69,40 @@ public class MovieController
     public boolean updateMovieRating(int movieId, double newRating)
     {
         try {
-            return movieDAO.updateMovieRating(movieId, newRating);
+            return movieDAO.updateMovieRating(movieId, newRating, getCurrentUserId());
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
     }
 
-    // Fetches all movies from database
+    // Fetches all movies for current user from database
     public List<Movie> fetchAllMovies()
     {
         try {
-            return movieDAO.fetchAllMovies();
+            return movieDAO.fetchAllMovies(getCurrentUserId());
         } catch (SQLException e) {
             e.printStackTrace();
             return List.of();
         }
     }
 
-    // Returns total number of movies
+    // Returns total number of movies for current user
     public int getTotalMovies() 
     {
-        return movieDAO.getTotalMovies();
+        return movieDAO.getTotalMovies(getCurrentUserId());
     }
 
-    // Returns total movies filtered by genre
+    // Returns total movies filtered by genre for current user
     public int getTotalMoviesByGenre(String genre) 
     {
-        return movieDAO.getTotalMoviesByGenre(genre);
+        return movieDAO.getTotalMoviesByGenre(genre, getCurrentUserId());
     }
     
     //Editing Movies
     public boolean updateMovie(int id, String title, String genre, String year, double rating) {
         try {
-            return movieDAO.updateMovie(id, title, genre, year, rating);
+            return movieDAO.updateMovie(id, title, genre, year, rating, getCurrentUserId());
         } catch (Exception e) {
             e.printStackTrace();
             return false;

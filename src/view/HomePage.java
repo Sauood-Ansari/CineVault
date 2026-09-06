@@ -2,6 +2,8 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
+import controller.AuthController;
+import utils.SessionManager;
 
 public class HomePage extends JPanel {
 
@@ -12,12 +14,13 @@ public class HomePage extends JPanel {
     private Dashboard dashboardPanel;
     private AddMoviePage addMoviePage;
     private MovieCollectionPage movieListPage;
+    private JLabel usernameLabel;
 
     public HomePage(MainFrame frame) {
         this.frame = frame;
         setLayout(new BorderLayout());
 
-        JPanel topBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel topBar = new JPanel(new BorderLayout());
         topBar.setPreferredSize(new Dimension(0, 70));
         topBar.setBackground(new Color(41, 128, 185));
         topBar.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
@@ -25,7 +28,12 @@ public class HomePage extends JPanel {
         JLabel appTitle = new JLabel("CineVault");
         appTitle.setFont(new Font("Segoe UI", Font.BOLD, 28));
         appTitle.setForeground(Color.WHITE);
-        topBar.add(appTitle);
+        topBar.add(appTitle, BorderLayout.WEST);
+
+        usernameLabel = new JLabel("");
+        usernameLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        usernameLabel.setForeground(Color.WHITE);
+        topBar.add(usernameLabel, BorderLayout.EAST);
 
         JPanel sideBar = new JPanel();
         sideBar.setLayout(new BoxLayout(sideBar, BoxLayout.Y_AXIS));
@@ -71,11 +79,24 @@ public class HomePage extends JPanel {
             cardLayout.show(contentPanel, "list");
         });
 
-        logOutBtn.addActionListener(e -> frame.showPage("login"));
+        logOutBtn.addActionListener(e -> {
+            new AuthController().logout();
+            frame.showPage("login");
+        });
 
         add(topBar, BorderLayout.NORTH);
         add(sideBar, BorderLayout.WEST);
         add(contentPanel, BorderLayout.CENTER);
+    }
+
+    // Refreshes all data when user logs in
+    public void refresh() {
+        if (SessionManager.isLoggedIn()) {
+            usernameLabel.setText("Welcome, " + SessionManager.getCurrentUser().getUsername());
+        }
+        dashboardPanel.refreshDashboard();
+        movieListPage.refreshTable();
+        cardLayout.show(contentPanel, "dashboard");
     }
 
     private JButton createNavButton(String text) {
@@ -90,4 +111,4 @@ public class HomePage extends JPanel {
         btn.setFont(new Font("Segoe UI", Font.BOLD, 16));
         return btn;
     }
-}
+}

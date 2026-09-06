@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import model.User;
 
 // DAO for user authentication and registration
 public class UserDAO {
@@ -23,12 +24,12 @@ public class UserDAO {
         }
     }
 
-    // Validates user login credentials
-    public boolean validateUser(String username, String password) throws SQLException {
+    // Validates user login credentials and returns User if valid, null otherwise
+    public User validateUser(String username, String password) throws SQLException {
         try (Connection conn = DBConnection.getConnection()) {
 
-            // Fetch stored password for given username
-            String query = "SELECT password FROM users WHERE username=?";
+            // Fetch stored id and password for given username
+            String query = "SELECT id, password FROM users WHERE username=?";
             PreparedStatement stmt = conn.prepareStatement(query);
 
             stmt.setString(1, username);
@@ -37,10 +38,12 @@ public class UserDAO {
             // Check if user exists and password matches
             if (rs.next()) {
                 String storedPassword = rs.getString("password");
-                return storedPassword.equals(password); // plain-text comparison
+                if (storedPassword.equals(password)) {
+                    return new User(rs.getInt("id"), username, null); // return user with id
+                }
             }
 
-            return false; // user not found
+            return null; // user not found or password mismatch
         }
     }
 }

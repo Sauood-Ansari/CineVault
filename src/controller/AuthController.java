@@ -22,11 +22,11 @@ public class AuthController {
 
         try {
             // Check credentials from database
-            boolean valid = userDAO.validateUser(username.trim(), password.trim());
+            User user = userDAO.validateUser(username.trim(), password.trim());
 
-            if (valid) {
+            if (user != null) {
                 // Start session if login successful
-                SessionManager.startSession(new User(username.trim(), null));
+                SessionManager.startSession(user);
                 return "SUCCESS";
             } else {
                 return "Invalid username or password.";
